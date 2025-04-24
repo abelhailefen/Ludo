@@ -1,7 +1,8 @@
+// src/app/layout.tsx
 import "./globals.css";
-import { ReactNode, useEffect } from "react";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Ludo Game",
   description: "Ludo powered by Socket.IO and Telegram Mini App",
 };
@@ -9,15 +10,8 @@ export const metadata = {
 export default function RootLayout({
   children,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://telegram.org/js/telegram-web-app.js";
-    script.async = true;
-    document.body.appendChild(script);
-  }, []);
-
   return (
     <html lang="en">
       <body>{children}</body>
