@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:ludo-production.up.railway.app4000");
+// Connect to your backend!
+const socket = io("https://ludo-production.up.railway.app", {
+  transports: ["websocket"],
+});
 
 export default function LudoGame() {
   const [color, setColor] = useState<string | null>(null);
