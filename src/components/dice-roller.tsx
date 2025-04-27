@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 type DiceRollerProps = {
   onRoll: (value: number) => void
   value: number
+  disabled?: boolean
 }
 
 export default function DiceRoller({ onRoll, value }: DiceRollerProps) {

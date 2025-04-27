@@ -4,6 +4,24 @@ import TelegramInit from "@/components/TelegramInit";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+declare global {
+  interface Window {
+    Telegram?: {
+      WebApp: {
+        ready: () => void;
+        expand: () => void;
+        initDataUnsafe?: {
+          user?: {
+            first_name: string;
+            username: string;
+            id: number;
+          };
+        };
+      };
+    };
+  }
+}
+
 
 export default function Home() {
   const [user, setUser] = useState<any>(null);
