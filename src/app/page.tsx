@@ -1,9 +1,19 @@
+// src/app/page.tsx
+
 "use client";
 
-import TelegramInit from "@/components/TelegramInit";
+import TelegramInit from "@/components/TelegramInit"; // Assuming this exists and is fine
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+// Define a type for the Telegram user info
+interface TelegramUser {
+  first_name: string;
+  username: string;
+  id: number;
+}
+
+// Keep the global declaration for window.Telegram
 declare global {
   interface Window {
     Telegram?: {
@@ -11,11 +21,7 @@ declare global {
         ready: () => void;
         expand: () => void;
         initDataUnsafe?: {
-          user?: {
-            first_name: string;
-            username: string;
-            id: number;
-          };
+          user?: TelegramUser; // Use the defined type here
         };
       };
     };
@@ -24,7 +30,8 @@ declare global {
 
 
 export default function Home() {
-  const [user, setUser] = useState<any>(null);
+  // Use the specific type or null for the user state
+  const [user, setUser] = useState<TelegramUser | null>(null); // <<< CHANGE 'any' TO 'TelegramUser | null'
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.Telegram?.WebApp) {
@@ -33,7 +40,8 @@ export default function Home() {
       tg.expand(); // optional: expand full screen
 
       const userInfo = tg.initDataUnsafe?.user;
-      setUser(userInfo);
+      // Set user state - TypeScript now knows userInfo is TelegramUser | undefined
+      setUser(userInfo ?? null); // Use nullish coalescing for safety
     }
   }, []);
 
@@ -42,7 +50,7 @@ export default function Home() {
       <TelegramInit />
       <main className="p-4">
         <h1 className="text-2xl font-bold">Welcome to Ludo!</h1>
-        {user ? (
+        {user ? ( // Check if user is not null
           <div>
             <p>Hello, {user.first_name} 👋</p>
             <p>Username: @{user.username}</p>
@@ -52,7 +60,7 @@ export default function Home() {
           <p>Loading Telegram user info...</p>
         )}
 
-<Link href="/ludo" className="mt-4 text-blue-600 underline">
+        <Link href="/ludo" className="mt-4 inline-block text-blue-600 underline"> {/* Added inline-block for spacing */}
           Go to Ludo Game
         </Link>
       </main>
