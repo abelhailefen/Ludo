@@ -8,28 +8,45 @@ const cn = (...classes: (string | undefined | null | false)[]) => {
 
 // Simple Slot implementation
 const Slot = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }>(
-  ({ children, ...props }, ref) => {
-    const child = React.Children.only(children) as React.ReactElement
-
-    return React.cloneElement(child, {
-      ...props,
-      ...child.props,
-      ref: ref
-        ? (node: HTMLElement) => {
-            // @ts-ignore - this is a simplified version
-            if (typeof child.ref === "function") child.ref(node)
-            // @ts-ignore - this is a simplified version
-            else if (child.ref) child.ref.current = node
-            // @ts-ignore - this is a simplified version
-            if (typeof ref === "function") ref(node)
-            // @ts-ignore - this is a simplified version
-            else if (ref) ref.current = node
-          }
-        : child.ref,
-    })
-  },
-)
-Slot.displayName = "Slot"
+    ({ children, ...props }, ref) => {
+      // Validate that children is a single, valid React element.
+      // React.Children.only will throw an error if it's not, which is acceptable behavior for Slot.
+      let child: React.ReactElement;
+      try {
+        child = React.Children.only(children) as React.ReactElement;
+      } catch (e) {
+        console.error("Slot component requires a single React element child.", e);
+        // Depending on requirements, you might return null, children, or re-throw.
+        // Returning null is often safest if props/ref merging is essential.
+        return null;
+      }
+  
+      // Ensure the child is actually a valid element after potentially catching errors above.
+      if (!React.isValidElement(child)) {
+          console.error("Slot component received an invalid React element child.");
+          return null;
+      }
+  
+      // Prepare the props for the cloned element.
+      // Start with the child's existing props, then override with Slot's props.
+      const mergedProps: React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<HTMLElement> } = {
+        ...(typeof child.props === "object" ? child.props : {}),
+        ...props,
+      };
+  
+      // Add the ref to the props object if a ref was passed to Slot.
+      // React.cloneElement knows how to handle the 'ref' property correctly.
+      if (ref) {
+        mergedProps.ref = ref;
+      }
+  
+      return React.cloneElement(
+        child, // The single child element to clone
+        mergedProps // The combined props, including the forwarded ref
+      );
+    },
+  );
+  Slot.displayName = "Slot"
 
 // Types for button props
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
